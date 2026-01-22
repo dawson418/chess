@@ -56,13 +56,13 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            return new BishopMoveValidator().pieceMoves(board, myPosition);
+        PieceType type = piece.getPieceType();
+        switch(type) {
+            case BISHOP -> { return new BishopMoveValidator().pieceMoves(board, myPosition); }
+            case ROOK -> { return new RookMoveValidator().pieceMoves(board, myPosition); }
+            case QUEEN -> { return new QueenMoveValidator().pieceMoves(board, myPosition);}
+            default -> {return List.of();}
         }
-        if (piece.getPieceType() == PieceType.ROOK) {
-            return new RookMoveValidator().pieceMoves(board, myPosition);
-        }
-        return List.of();
     }
 
     @Override
