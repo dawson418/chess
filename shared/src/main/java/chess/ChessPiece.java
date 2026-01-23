@@ -63,6 +63,7 @@ public class ChessPiece {
             case QUEEN -> { return new QueenMoveValidator().pieceMoves(board, myPosition); }
             case PAWN -> {return new PawnMoveValidator().pieceMoves(board, myPosition); }
             case KING -> {return new KingMoveValidator().pieceMoves(board, myPosition); }
+            case KNIGHT -> {return new KnightMoveValidator().pieceMoves(board, myPosition); }
             default -> {return List.of();}
         }
     }
