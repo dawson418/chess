@@ -4,69 +4,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class RookMoveValidator implements ChessMoveValidator{
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
+
+    public Collection<ChessMove> pieceMoves (ChessBoard board, ChessPosition myPosition) {
+        int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
         ArrayList<ChessMove> validMoves = new ArrayList<>();
-        int row = position.getRow();
-        int col = position.getColumn();
-        ChessGame.TeamColor selfColor = board.getPiece(position).getTeamColor();
-        //Add the valid moves below the piece
-        for (int i = 1; i < 8; i++) {
-            ChessPosition potentialPosition = new ChessPosition(row, col - i);
-            if(col - i < 1){
-                break;
-            }
-            if(board.getPiece(potentialPosition)!=null){
-                if(board.getPiece(potentialPosition).getTeamColor() != selfColor){
-                    validMoves.add(new ChessMove(position, potentialPosition, null));
+        ChessGame.TeamColor selfColor = board.getPiece(myPosition).getTeamColor();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        for (int[] dir : directions) {
+            for (int i = 1; i < 8; i++) {
+                if (row + (dir[0] * i) < 1|| 8 < row + (dir[0] * i)|| col + (dir[1] * i) < 1 || 8 < col + (dir[1] * i)) {
+                    break;
                 }
-                break;
-            }
-            validMoves.add(new ChessMove(position, potentialPosition, null));
-        }
-        //Add the valid moves above the piece
-        for (int i = 1; i < 8; i++) {
-            ChessPosition potentialPosition = new ChessPosition(row, col + i);
-            if(col + i > 8){
-                break;
-            }
-            if(board.getPiece(potentialPosition)!=null){
-                if(board.getPiece(potentialPosition).getTeamColor() != selfColor){
-                    validMoves.add(new ChessMove(position, potentialPosition, null));
+                ChessPosition potentialPos = new ChessPosition(row + (dir[0] * i), col + (dir[1] * i));
+                if (board.getPiece(potentialPos) != null) {
+                    if(board.getPiece(potentialPos).getTeamColor() != selfColor) {
+                        validMoves.add(new ChessMove(myPosition, potentialPos, null));
+                    }
+                    break;
                 }
-                break;
+                validMoves.add(new ChessMove(myPosition, potentialPos, null));
             }
-            validMoves.add(new ChessMove(position, potentialPosition, null));
-        }
-        //Add the valid moves to the left of the piece
-        for (int i = 1; i < 8; i++) {
-            ChessPosition potentialPosition = new ChessPosition(row - i, col);
-            if(row - i < 1){
-                break;
-            }
-            if(board.getPiece(potentialPosition)!=null){
-                if(board.getPiece(potentialPosition).getTeamColor() != selfColor){
-                    validMoves.add(new ChessMove(position, potentialPosition, null));
-                }
-                break;
-            }
-            validMoves.add(new ChessMove(position, potentialPosition, null));
-        }
-        //Add the valid moves to the right of the piece
-        for (int i = 1; i < 8; i++) {
-            ChessPosition potentialPosition = new ChessPosition(row + i, col);
-            if(row + i > 8){
-                break;
-            }
-            if(board.getPiece(potentialPosition)!=null){
-                if(board.getPiece(potentialPosition).getTeamColor() != selfColor){
-                    validMoves.add(new ChessMove(position, potentialPosition, null));
-                }
-                break;
-            }
-            validMoves.add(new ChessMove(position, potentialPosition, null));
         }
         return validMoves;
     }
 }
+
 
 

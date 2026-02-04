@@ -25,6 +25,7 @@ public class PawnMoveValidator implements ChessMoveValidator{
                 } else {
                     validMoves.add(new ChessMove(position, potentialPosition, null));
                 }
+                //Check for double-move opportunity
                 if (row == 2 && board.getPiece(new ChessPosition(row + 2, col)) == null) {
                     validMoves.add(new ChessMove(position, new ChessPosition(row + 2, col), null));
                 }
