@@ -19,6 +19,7 @@ public class ChessGame {
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
         mainBoard = new ChessBoard();
+        mainBoard.resetBoard();
     }
 
     /**
@@ -56,7 +57,7 @@ public class ChessGame {
         if (mainBoard.getPiece(startPosition) != null){
             ArrayList<ChessMove> outMoves = new ArrayList<>();
             for (ChessMove move : mainBoard.getPiece(startPosition).pieceMoves(mainBoard, startPosition)) {
-                if (isMoveSafe(move, teamTurn)){
+                if (isMoveSafe(move, mainBoard.getPiece(move.getStartPosition()).getTeamColor())){
                     outMoves.add(move);
                 }
             }
@@ -186,15 +187,28 @@ public class ChessGame {
 
     private boolean isMoveSafe(ChessMove move, TeamColor teamColor) {
         ChessBoard tempBoard = new ChessBoard(mainBoard);
-        ChessGame tempGame = new ChessGame();
-        tempGame.setBoard(tempBoard);
-        tempGame.setTeamTurn(teamTurn);
-        try {
-            tempGame.makeMove(move);
-            return !tempGame.isInCheck(teamColor);
-        } catch (InvalidMoveException e) {
-            return false;
+        ChessPiece piece = tempBoard.getPiece(move.getStartPosition());
+        if (move.getPromotionPiece() != null) {
+            piece = new ChessPiece(teamColor, move.getPromotionPiece());
         }
+        tempBoard.addPiece(move.getEndPosition(), piece);
+        tempBoard.addPiece(move.getStartPosition(), null);
+        ChessPosition kingPos = findKingPosition(teamColor, tempBoard);
+        if (kingPos == null) return false;
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition pos = new ChessPosition(i, j);
+                ChessPiece enemyPiece = tempBoard.getPiece(pos);
+                if (enemyPiece != null && enemyPiece.getTeamColor() != teamColor) {
+                    for (ChessMove enemyMove : enemyPiece.pieceMoves(tempBoard, pos)) {
+                        if (enemyMove.getEndPosition().equals(kingPos)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
