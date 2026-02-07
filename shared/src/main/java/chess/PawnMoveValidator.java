@@ -32,7 +32,8 @@ public class PawnMoveValidator implements ChessMoveValidator{
             }
             //Try to move right diagonally and capture
             potentialPosition = new ChessPosition(row + 1, col + 1);
-            if(col < 8 && board.getPiece(potentialPosition) != null && board.getPiece(potentialPosition).getTeamColor() == ChessGame.TeamColor.BLACK) {
+            if(col < 8 && board.getPiece(potentialPosition) != null
+                    && board.getPiece(potentialPosition).getTeamColor() == ChessGame.TeamColor.BLACK) {
                 if(row == 7) {
                     for (int i = 0; i < 4; i++) {
                         validMoves.add(new ChessMove(position, potentialPosition, promotionChoices[i]));
