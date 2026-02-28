@@ -17,7 +17,7 @@ public class UserMemoryData implements UserDataAccess{
     @Override
     public void createUser(UserData data) throws DataAccessException{
         if (users.containsKey(data.username())){
-            throw new DataAccessException("Username already taken");
+            throw new AlreadyTakenException();
         }
         else{
             users.put(data.username(), data);
