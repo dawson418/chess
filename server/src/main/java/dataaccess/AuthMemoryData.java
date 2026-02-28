@@ -9,6 +9,10 @@ public class AuthMemoryData implements AuthDataAccess{
 
     private final HashMap<String, String> authTokens;
 
+    public AuthMemoryData(){
+        this.authTokens = new HashMap<>();
+    }
+
     public AuthMemoryData(HashMap<String, String> authTokens) {
         this.authTokens = authTokens;
     }

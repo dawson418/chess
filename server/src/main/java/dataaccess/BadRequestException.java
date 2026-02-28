@@ -1,7 +1,7 @@
 package dataaccess;
 
 public class BadRequestException extends DataAccessException {
-    public BadRequestException(String message) {
+    public BadRequestException() {
         super("Error: bad request");
     }
 }
