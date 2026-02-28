@@ -14,8 +14,8 @@ public class UserService {
     private final UserDataAccess u;
     private final AuthDataAccess a;
 
-    public UserService(UserDataAccess dataAccess, AuthDataAccess a) {
-        this.u = dataAccess;
+    public UserService(UserDataAccess u, AuthDataAccess a) {
+        this.u = u;
         this.a = a;
     }
 

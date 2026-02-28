@@ -7,9 +7,14 @@ import java.util.Collection;
 
 public interface GameDataAccess {
     public void clear() throws DataAccessException;
+
     GameData createGame(String name) throws DataAccessException;
+
     GameData getGame(int gameID) throws DataAccessException;
+
     boolean checkEmpty(ChessGame.TeamColor playerColor, int gameID) throws DataAccessException;
+
     GameData updateGame(int gameID) throws DataAccessException;
+
     Collection<GameData> listGames() throws DataAccessException;
 }
