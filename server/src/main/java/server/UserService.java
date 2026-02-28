@@ -10,7 +10,7 @@ import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
 
-public class UserService {
+public class UserService{
     private final UserDataAccess u;
     private final AuthDataAccess a;
 
