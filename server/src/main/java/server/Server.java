@@ -1,7 +1,6 @@
 package server;
 
 import dataaccess.*;
-import handler.AuthHandler;
 import handler.GameHandler;
 import handler.Handler;
 import handler.UserHandler;
@@ -21,7 +20,6 @@ public class Server {
         AuthService authService = new AuthService(authDAO);
 
         UserHandler userHandler = new UserHandler(userService);
-        AuthHandler authHandler = new AuthHandler(authService);
         GameHandler gameHandler = new GameHandler(gameService, authService);
         Handler masterHandler = new Handler();
 
@@ -33,7 +31,6 @@ public class Server {
                 .get("/game", gameHandler::handleListGames)
                 .delete("/session", userHandler::handleLogout)
                 .delete("/db", ctx -> masterHandler.handleClear(ctx, authService, gameService, userService));
-
     }
 
     public int run(int desiredPort) {

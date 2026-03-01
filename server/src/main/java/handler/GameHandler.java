@@ -20,7 +20,7 @@ public class GameHandler extends Handler{
         this.authService = authService;
     }
 
-    public void handleCreateGame(Context ctx) throws DataAccessException{
+    public void handleCreateGame(Context ctx){
         Gson gson = new Gson();
         try{
             String authToken = ctx.header("authorization");
@@ -35,7 +35,7 @@ public class GameHandler extends Handler{
         }
     }
 
-    public void handleListGames(Context ctx) throws DataAccessException{
+    public void handleListGames(Context ctx){
         Gson gson = new Gson();
         try{
             String authToken = ctx.header("authorization");
@@ -49,7 +49,7 @@ public class GameHandler extends Handler{
         }
     }
 
-    public void handleJoinGame(Context ctx) throws DataAccessException{
+    public void handleJoinGame(Context ctx){
         Gson gson = new Gson();
         try{
             String authToken = ctx.header("authorization");

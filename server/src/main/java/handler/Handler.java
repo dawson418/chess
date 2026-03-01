@@ -30,7 +30,6 @@ public class Handler {
     }
 
     public void handleClear(Context ctx, AuthService as, GameService gs, UserService us){
-        Gson gson = new Gson();
         try{
             us.clear();
             as.clear();

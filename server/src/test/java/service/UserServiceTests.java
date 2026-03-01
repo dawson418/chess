@@ -37,4 +37,6 @@ public class UserServiceTests {
         RegisterRequest request = new RegisterRequest("bob", "password123", "test@byu.edu");
         assertThrows(AlreadyTakenException.class, () -> service.register(request));
     }
+
+
 }
