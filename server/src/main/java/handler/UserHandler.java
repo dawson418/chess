@@ -2,15 +2,15 @@ package handler;
 
 
 import com.google.gson.Gson;
-import dataaccess.AlreadyTakenException;
-import dataaccess.BadRequestException;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import io.javalin.http.Context;
+import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.*;
 import server.UserService;
 
-public class UserHandler{
+public class UserHandler extends Handler{
     final private UserService service;
 
     public UserHandler(UserService userService) {
@@ -26,15 +26,32 @@ public class UserHandler{
             ctx.result(gson.toJson(result));
         }
         catch(DataAccessException e){
-            ErrorResult result = new ErrorResult(e.getMessage());
-            if (e.getClass().equals(BadRequestException.class)){
-                ctx.status(400);
-            }
-            else if(e.getClass().equals(AlreadyTakenException.class)){
-                ctx.status(403);
-            }
-            else{ctx.status(500);}
+            handleError(ctx, e);
+        }
+    }
+
+    public void handleLogin(Context ctx){
+        Gson gson = new Gson();
+        try{
+            LoginRequest request = gson.fromJson(ctx.body(), LoginRequest.class);
+            LoginResult result = service.login(request);
+            ctx.status(200);
             ctx.result(gson.toJson(result));
+        }catch(DataAccessException e){
+            handleError(ctx, e);
+        }
+    }
+
+    public void handleLogout(Context ctx){
+        Gson gson = new Gson();
+        try{
+            String authToken = ctx.header("authorization");
+            LogoutRequest request = new LogoutRequest(authToken);
+            service.logout(request);
+            ctx.status(200);
+            ctx.result("{}");
+        } catch(DataAccessException e){
+            handleError(ctx, e);
         }
     }
 }

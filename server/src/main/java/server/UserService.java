@@ -5,7 +5,7 @@ import model.*;
 import request.*;
 import result.*;
 
-public class UserService{
+public class UserService extends Service{
     private final UserDataAccess userDAO;
     private final AuthDataAccess authDAO;
 
@@ -22,9 +22,24 @@ public class UserService{
         AuthData auth = authDAO.createAuth(registerRequest.username());
         return new LoginResult(auth.username(), auth.authToken());
     }
-    public LoginResult login(LoginRequest loginRequest) {
-        return null;
+
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        if (loginRequest.username() == null || loginRequest.password() == null){
+            throw new BadRequestException();
+        }
+        userDAO.getUser(loginRequest.username(), loginRequest.password());
+        AuthData newAuth = authDAO.createAuth(loginRequest.username());
+        return new LoginResult(loginRequest.username(), newAuth.authToken());
     }
-    public void logout(LogoutRequest logoutRequest) {
+
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException{
+        if (logoutRequest.authToken() == null){
+            throw new BadRequestException();
+        }
+        authDAO.deleteAuth(logoutRequest.authToken());
+    }
+
+    public void clear() throws DataAccessException{
+        userDAO.clear();
     }
 }

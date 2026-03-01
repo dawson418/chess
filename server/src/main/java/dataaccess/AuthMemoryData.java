@@ -24,9 +24,6 @@ public class AuthMemoryData implements AuthDataAccess{
 
     @Override
     public AuthData createAuth(String username) throws DataAccessException {
-        if(authTokens.containsValue(username)){
-            return new AuthData(authTokens.get(username), username);
-        }
         String newAuth = UUID.randomUUID().toString();
         authTokens.put(newAuth, username);
         return new AuthData(newAuth, username);
@@ -35,13 +32,16 @@ public class AuthMemoryData implements AuthDataAccess{
     @Override
     public boolean isAuthorized(String authToken) throws DataAccessException {
         if(!authTokens.containsKey(authToken)){
-            throw new DataAccessException("Not authorized");
+            throw new UnauthorizedException();
         }
         else return true;
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
+        if(!authTokens.containsKey(authToken)) {
+            throw new UnauthorizedException();
+        }
         authTokens.remove(authToken);
     }
 }
