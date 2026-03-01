@@ -5,7 +5,6 @@ import model.GameData;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 public class GameMemoryData implements GameDataAccess{
 
@@ -40,6 +39,20 @@ public class GameMemoryData implements GameDataAccess{
         }
         else{
             return game.whiteUsername() == null;
+        }
+    }
+
+    @Override
+    public void joinGame(ChessGame.TeamColor playerColor, int gameID, String username) throws DataAccessException{
+        if(!games.containsKey(gameID)){
+            throw new DataAccessException("Game doesn't exist");
+        }
+        GameData old = games.get(gameID);
+        if (playerColor.equals(ChessGame.TeamColor.WHITE)){
+            games.put(gameID, new GameData(gameID, username, old.blackUsername(),old.gameName(), old.game()));
+        }
+        else{
+            games.put(gameID, new GameData(gameID, old.whiteUsername(), username,old.gameName(), old.game()));
         }
     }
 

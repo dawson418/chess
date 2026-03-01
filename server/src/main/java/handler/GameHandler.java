@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import request.CreateGameRequest;
+import request.JoinGameRequest;
 import result.CreateGameResult;
 import result.ListGamesResult;
 import server.AuthService;
@@ -54,7 +55,14 @@ public class GameHandler extends Handler{
             String authToken = ctx.header("authorization");
             checkAuth(authToken, authService);
             JoinGameRequest request = gson.fromJson(ctx.body(), JoinGameRequest.class);
-            gameService.joinGame()
+            String username = authService.getUsername(authToken);
+            request = new JoinGameRequest(request.playerColor(), request.gameID(), username);
+            gameService.joinGame(request);
+            ctx.status(200);
+            ctx.result("{}");
+        }
+        catch(DataAccessException e){
+            handleError(ctx, e);
         }
     }
 }

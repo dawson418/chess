@@ -18,4 +18,8 @@ public class AuthService extends Service {
     public void isAuthorized(String authToken) throws DataAccessException{
         authDAO.isAuthorized(authToken);
     }
+
+    public String getUsername(String authToken) throws DataAccessException{
+        return authDAO.getUsername(authToken);
+    }
 }

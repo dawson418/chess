@@ -44,4 +44,9 @@ public class AuthMemoryData implements AuthDataAccess{
         }
         authTokens.remove(authToken);
     }
+
+    @Override
+    public String getUsername(String authToken) throws DataAccessException {
+        return authTokens.get(authToken);
+    }
 }

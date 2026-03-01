@@ -10,4 +10,6 @@ public interface AuthDataAccess {
     boolean isAuthorized(String authToken) throws DataAccessException;
 
     void deleteAuth(String authToken) throws DataAccessException;
+
+    String getUsername(String authToken) throws DataAccessException;
 }

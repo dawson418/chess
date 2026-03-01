@@ -14,6 +14,8 @@ public interface GameDataAccess {
 
     boolean isEmpty(ChessGame.TeamColor playerColor, int gameID) throws DataAccessException;
 
+    void joinGame(ChessGame.TeamColor playerColor, int gameID, String username) throws DataAccessException;
+
     GameData updateGame(int gameID) throws DataAccessException;
 
     Collection<GameData> listGames() throws DataAccessException;

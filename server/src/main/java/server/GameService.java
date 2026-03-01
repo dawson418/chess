@@ -1,9 +1,9 @@
 package server;
 
 import dataaccess.*;
-import model.AuthData;
 import model.GameData;
 import request.CreateGameRequest;
+import request.JoinGameRequest;
 import result.CreateGameResult;
 import result.ListGamesResult;
 
@@ -28,5 +28,16 @@ public class GameService extends Service{
 
     public ListGamesResult listGames() throws DataAccessException {
         return new ListGamesResult(gameDAO.listGames());
+    }
+
+    public void joinGame(JoinGameRequest request) throws DataAccessException{
+        if (request.playerColor() == null || request.gameID() <= 0){
+            throw new BadRequestException();
+        }
+        if(!gameDAO.isEmpty(request.playerColor(), request.gameID())){
+            throw new AlreadyTakenException();
+        }
+
+        gameDAO.joinGame(request.playerColor(), request.gameID(), request.username());
     }
 }
