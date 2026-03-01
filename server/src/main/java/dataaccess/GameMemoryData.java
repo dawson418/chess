@@ -4,28 +4,43 @@ import chess.ChessGame;
 import model.GameData;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public class GameMemoryData implements GameDataAccess{
 
+    private int currID = 1233;
+    private final HashMap<Integer, GameData> games = new HashMap<>();
+
     @Override
     public void clear() throws DataAccessException {
-
+        games.clear();
     }
 
     @Override
     public GameData createGame(String name) throws DataAccessException {
-        return null;
+        int id = getNextID();
+        games.put(id, new GameData(id, null, null, name, new ChessGame()));
+        return games.get(id);
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        return null;
+        if(!games.containsKey(gameID)){
+            throw new DataAccessException("No game with that Game ID");
+        }
+        return games.get(gameID);
     }
 
     @Override
-    public boolean checkEmpty(ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
-        return false;
+    public boolean isEmpty(ChessGame.TeamColor playerColor, int gameID) {
+        GameData game = games.get(gameID);
+        if(playerColor.equals(ChessGame.TeamColor.BLACK)){
+            return game.blackUsername() == null;
+        }
+        else{
+            return game.whiteUsername() == null;
+        }
     }
 
     @Override
@@ -35,6 +50,11 @@ public class GameMemoryData implements GameDataAccess{
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        return List.of();
+        return games.values();
+    }
+
+    private int getNextID(){
+        currID++;
+        return currID;
     }
 }

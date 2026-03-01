@@ -6,10 +6,10 @@ import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
+import model.AuthData;
 import result.ErrorResult;
 import server.AuthService;
 import server.GameService;
-import server.Service;
 import server.UserService;
 
 public class Handler {
@@ -40,5 +40,9 @@ public class Handler {
         } catch (DataAccessException e){
             handleError(ctx, e);
         }
+    }
+
+    public void checkAuth(String authToken, AuthService as) throws DataAccessException{
+        as.isAuthorized(authToken);
     }
 }

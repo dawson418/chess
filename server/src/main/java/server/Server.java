@@ -17,18 +17,20 @@ public class Server {
         GameDataAccess gameDAO = new GameMemoryData();
 
         UserService userService = new UserService(userDAO, authDAO);
-        GameService gameService = new GameService(gameDAO, authDAO);
+        GameService gameService = new GameService(gameDAO);
         AuthService authService = new AuthService(authDAO);
 
         UserHandler userHandler = new UserHandler(userService);
         AuthHandler authHandler = new AuthHandler(authService);
-        GameHandler gameHandler = new GameHandler();
+        GameHandler gameHandler = new GameHandler(gameService, authService);
         Handler masterHandler = new Handler();
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", userHandler::handleRegister)
                 .post("/session", userHandler::handleLogin)
-                .post("/game", gameHandler::handleCreate)
+                .post("/game", gameHandler::handleCreateGame)
+                .put("/game", gameHandler::handleJoinGame)
+                .get("/game", gameHandler::handleListGames)
                 .delete("/session", userHandler::handleLogout)
                 .delete("/db", ctx -> masterHandler.handleClear(ctx, authService, gameService, userService));
 

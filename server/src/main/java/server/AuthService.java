@@ -2,7 +2,6 @@ package server;
 
 import dataaccess.AuthDataAccess;
 import dataaccess.DataAccessException;
-import handler.Handler;
 
 public class AuthService extends Service {
     private final AuthDataAccess authDAO;
@@ -14,5 +13,9 @@ public class AuthService extends Service {
     @Override
     public void clear() throws DataAccessException{
         authDAO.clear();
+    }
+
+    public void isAuthorized(String authToken) throws DataAccessException{
+        authDAO.isAuthorized(authToken);
     }
 }

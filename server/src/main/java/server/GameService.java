@@ -2,17 +2,31 @@ package server;
 
 import dataaccess.*;
 import model.AuthData;
+import model.GameData;
+import request.CreateGameRequest;
+import result.CreateGameResult;
+import result.ListGamesResult;
 
 public class GameService extends Service{
     private final GameDataAccess gameDAO;
-    private final AuthDataAccess authDAO;
 
-    public GameService(GameDataAccess gameDAO, AuthDataAccess authDAO) {
+    public GameService(GameDataAccess gameDAO) {
         this.gameDAO = gameDAO;
-        this.authDAO = authDAO;
     }
 
     public void clear() throws DataAccessException {
         gameDAO.clear();
+    }
+
+    public CreateGameResult createGame(CreateGameRequest request)throws DataAccessException {
+        if (request.gameName() == null) {
+            throw new BadRequestException();
+        }
+        GameData data = gameDAO.createGame(request.gameName());
+        return new CreateGameResult(data.gameID());
+    }
+
+    public ListGamesResult listGames() throws DataAccessException {
+        return new ListGamesResult(gameDAO.listGames());
     }
 }

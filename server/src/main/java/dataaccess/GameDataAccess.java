@@ -12,7 +12,7 @@ public interface GameDataAccess {
 
     GameData getGame(int gameID) throws DataAccessException;
 
-    boolean checkEmpty(ChessGame.TeamColor playerColor, int gameID) throws DataAccessException;
+    boolean isEmpty(ChessGame.TeamColor playerColor, int gameID) throws DataAccessException;
 
     GameData updateGame(int gameID) throws DataAccessException;
 
