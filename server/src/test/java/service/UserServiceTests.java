@@ -1,7 +1,11 @@
 package service;
 
 import dataaccess.*;
+import model.AuthData;
+import model.UserData;
 import org.junit.jupiter.api.Test;
+import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
 import server.UserService;
@@ -38,5 +42,40 @@ public class UserServiceTests {
         assertThrows(AlreadyTakenException.class, () -> service.register(request));
     }
 
+    @Test
+    public void loginPositive() throws DataAccessException{
+        initVars();
+        userDAO.createUser(new UserData("chess_lover67", "password123", "lol"));
+        LoginRequest request = new LoginRequest("chess_lover67", "password123");
+        LoginResult result = service.login(request);
+        assertNotNull(result);
+        assertEquals("chess_lover67", result.username());
+        assertNotNull(result.authToken());
+        assertInstanceOf(String.class, result.authToken());
+    }
 
+    @Test
+    public void loginWrongPassword() throws DataAccessException{
+        initVars();
+        userDAO.createUser(new UserData("chess_lover67", "password123", "lol"));
+        LoginRequest request = new LoginRequest("chess_lover67", "wrong");
+        assertThrows(UnauthorizedException.class, () -> service.login(request));
+    }
+
+    @Test
+    public void logoutPositive() throws DataAccessException {
+        initVars();
+        AuthData authData = authDAO.createAuth("chess_lover67");
+        LogoutRequest request = new LogoutRequest(authData.authToken());
+        service.logout(request);
+        assertThrows(UnauthorizedException.class, () -> authDAO.isAuthorized(authData.authToken()));
+    }
+
+    @Test
+    public void logoutInvalidToken() throws DataAccessException {
+        initVars();
+        AuthData authData = authDAO.createAuth("chess_lover67");
+        LogoutRequest request = new LogoutRequest("this is the wrong token");
+        assertThrows(UnauthorizedException.class, () -> service.logout(request));
+    }
 }
