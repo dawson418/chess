@@ -7,7 +7,7 @@ public interface AuthDataAccess {
 
     AuthData createAuth(String username) throws DataAccessException;
 
-    boolean isAuthorized(String authToken) throws DataAccessException;
+    void isAuthorized(String authToken) throws DataAccessException;
 
     void deleteAuth(String authToken) throws DataAccessException;
 

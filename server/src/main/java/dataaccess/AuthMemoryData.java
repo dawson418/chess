@@ -30,11 +30,10 @@ public class AuthMemoryData implements AuthDataAccess{
     }
 
     @Override
-    public boolean isAuthorized(String authToken) throws DataAccessException {
+    public void isAuthorized(String authToken) throws DataAccessException {
         if(!authTokens.containsKey(authToken)){
             throw new UnauthorizedException();
         }
-        else return true;
     }
 
     @Override
