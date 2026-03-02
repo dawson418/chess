@@ -57,11 +57,6 @@ public class GameMemoryData implements GameDataAccess{
     }
 
     @Override
-    public GameData updateGame(int gameID) throws DataAccessException {
-        return null;
-    }
-
-    @Override
     public Collection<GameData> listGames() throws DataAccessException {
         return games.values();
     }
