@@ -12,16 +12,10 @@ import server.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserServiceTests {
+public class UserServiceTests extends ServiceTests{
     private UserService service;
     private UserDataAccess userDAO;
     private AuthDataAccess authDAO;
-
-    public void initVars(){
-        userDAO = new UserMemoryData();
-        authDAO = new AuthMemoryData();
-        service = new UserService(userDAO, authDAO);
-    }
 
     @Test
     public void registerPositive() throws DataAccessException {
