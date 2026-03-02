@@ -8,20 +8,28 @@ import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
+import server.AuthService;
+import server.GameService;
 import server.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserServiceTests extends ServiceTests{
-    private UserService service;
+public class UserServiceTests{
+    private UserService userService;
     private UserDataAccess userDAO;
     private AuthDataAccess authDAO;
+
+    public void initVars(){
+        this.authDAO = new AuthMemoryData();
+        this.userDAO = new UserMemoryData();
+        this.userService = new UserService(userDAO, authDAO);
+    }
 
     @Test
     public void registerPositive() throws DataAccessException {
         initVars();
         RegisterRequest request = new RegisterRequest("chess_lover67", "password123", "test@byu.edu");
-        LoginResult result = service.register(request);
+        LoginResult result = userService.register(request);
         assertNotNull(result);
         assertEquals("chess_lover67", result.username());
         assertNotNull(result.authToken());
@@ -31,9 +39,9 @@ public class UserServiceTests extends ServiceTests{
     @Test
     public void registerUserTaken() throws DataAccessException{
         initVars();
-        service.register(new RegisterRequest("bob", "123", "hey@gmail.com"));
+        userService.register(new RegisterRequest("bob", "123", "hey@gmail.com"));
         RegisterRequest request = new RegisterRequest("bob", "password123", "test@byu.edu");
-        assertThrows(AlreadyTakenException.class, () -> service.register(request));
+        assertThrows(AlreadyTakenException.class, () -> userService.register(request));
     }
 
     @Test
@@ -41,7 +49,7 @@ public class UserServiceTests extends ServiceTests{
         initVars();
         userDAO.createUser(new UserData("chess_lover67", "password123", "lol"));
         LoginRequest request = new LoginRequest("chess_lover67", "password123");
-        LoginResult result = service.login(request);
+        LoginResult result = userService.login(request);
         assertNotNull(result);
         assertEquals("chess_lover67", result.username());
         assertNotNull(result.authToken());
@@ -53,7 +61,7 @@ public class UserServiceTests extends ServiceTests{
         initVars();
         userDAO.createUser(new UserData("chess_lover67", "password123", "lol"));
         LoginRequest request = new LoginRequest("chess_lover67", "wrong");
-        assertThrows(UnauthorizedException.class, () -> service.login(request));
+        assertThrows(UnauthorizedException.class, () -> userService.login(request));
     }
 
     @Test
@@ -61,15 +69,15 @@ public class UserServiceTests extends ServiceTests{
         initVars();
         AuthData authData = authDAO.createAuth("chess_lover67");
         LogoutRequest request = new LogoutRequest(authData.authToken());
-        service.logout(request);
+        userService.logout(request);
         assertThrows(UnauthorizedException.class, () -> authDAO.isAuthorized(authData.authToken()));
     }
 
     @Test
     public void logoutInvalidToken() throws DataAccessException {
         initVars();
-        AuthData authData = authDAO.createAuth("chess_lover67");
+        authDAO.createAuth("chess_lover67");
         LogoutRequest request = new LogoutRequest("this is the wrong token");
-        assertThrows(UnauthorizedException.class, () -> service.logout(request));
+        assertThrows(UnauthorizedException.class, () -> userService.logout(request));
     }
 }
