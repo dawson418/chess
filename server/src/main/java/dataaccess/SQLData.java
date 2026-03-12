@@ -57,12 +57,13 @@ public class SQLData {
             """,
             """
             CREATE TABLE IF NOT EXISTS game (
-            `gameid` int NOT NULL AUTO_INCREMENT,
-            `whiteuser` varchar(256),
-            `blackuser` varchar(256),
-            `name` varchar(256),
-            `chessgame` json TEXT NOT NULL),
-            PRIMARY KEY (`gameid`)
+              `gameid` int NOT NULL AUTO_INCREMENT,
+              `whiteuser` varchar(256) DEFAULT NULL,
+              `blackuser` varchar(256) DEFAULT NULL,
+              `name` varchar(256) NOT NULL,
+              `chessgame` TEXT NOT NULL,
+              PRIMARY KEY (`gameid`)
+            )
             """
     };
 }
