@@ -6,10 +6,16 @@ import model.GameData;
 import java.util.Collection;
 import java.util.List;
 
-public class GameSQLData implements GameDataAccess{
+public class GameSQLData extends SQLData implements GameDataAccess{
+
+    public GameSQLData() throws DataAccessException {
+        configureDatabase();
+    }
+
     @Override
     public void clear() throws DataAccessException {
-
+        var statement = "TRUNCATE game";
+        executeUpdate(statement);
     }
 
     @Override

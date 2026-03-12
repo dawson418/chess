@@ -46,7 +46,7 @@ public class AuthSQLData extends SQLData implements AuthDataAccess{
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        var statement = "DELETE token,username FROM auth WHERE token=?";
+        var statement = "DELETE FROM auth WHERE token=?";
         executeUpdate(statement, authToken);
     }
 

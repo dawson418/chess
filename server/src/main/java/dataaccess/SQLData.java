@@ -61,7 +61,7 @@ public class SQLData {
             `whiteuser` varchar(256),
             `blackuser` varchar(256),
             `name` varchar(256),
-            `chessgame` json TEXT DEFAULT NULL),
+            `chessgame` json TEXT NOT NULL),
             PRIMARY KEY (`gameid`)
             """
     };

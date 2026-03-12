@@ -2,6 +2,7 @@ package dataaccess;
 
 import com.google.gson.Gson;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,7 +27,8 @@ public class UserSQLData extends SQLData implements UserDataAccess {
     @Override
     public void createUser(UserData data) throws DataAccessException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, data.username(), data.password(), data.email());
+        String hashedPassword = BCrypt.hashpw(data.password(), BCrypt.gensalt());
+        executeUpdate(statement, data.username(), hashedPassword, data.email());
     }
 
     @Override
@@ -37,13 +39,18 @@ public class UserSQLData extends SQLData implements UserDataAccess {
                 ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                        String storedHashedPW = rs.getString("password");
+                        if(BCrypt.checkpw(password, storedHashedPW)){
+                            return new UserData(username, password, rs.getString("email"));
+                        } else {
+                            throw new UnauthorizedException();
+                        }
                     }
                 }
             }
         } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
-        return null;
+        throw new UnauthorizedException();
     }
 }
