@@ -33,7 +33,11 @@ public class AuthSQLData extends SQLData implements AuthDataAccess{
             var statement = "SELECT token, username FROM auth WHERE token=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, authToken);
-                ps.executeQuery();
+                try(ResultSet rs = ps.executeQuery()){
+                    if (!rs.next()){
+                        throw new UnauthorizedException();
+                    }
+                }
             }
         } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
