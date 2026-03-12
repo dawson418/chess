@@ -15,12 +15,11 @@ import java.util.List;
 
 public class GameSQLData extends SQLData implements GameDataAccess{
 
+    private final Gson gson = new Gson();
+
     public GameSQLData() throws DataAccessException {
         configureDatabase();
-        Gson gson = new Gson();
     }
-
-    private Gson gson;
 
     @Override
     public void clear() throws DataAccessException {
@@ -30,10 +29,13 @@ public class GameSQLData extends SQLData implements GameDataAccess{
 
     @Override
     public GameData createGame(String name) throws DataAccessException {
+        if (name.isEmpty()){
+            throw new BadRequestException();
+        }
         var statement = "INSERT INTO game (whiteuser, blackuser, name, chessgame) VALUES (?, ?, ?, ?)";
         ChessGame game = new ChessGame();
         String jsonGame = gson.toJson(game);
-        int gameID = executeUpdate(statement, null, null, jsonGame);
+        int gameID = executeUpdate(statement, null, null, name, jsonGame);
         return new GameData(gameID, null, null, name, game);
     }
 
@@ -50,14 +52,14 @@ public class GameSQLData extends SQLData implements GameDataAccess{
                                 rs.getString("whiteuser"),
                                 rs.getString("blackuser"),
                                 rs.getString("name"),
-                                gson.fromJson(rs.getString("chess"), ChessGame.class)
+                                gson.fromJson(rs.getString("chessgame"), ChessGame.class)
                                 );
                     }
                 }
             }
 
         } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
+            throw new BadRequestException();
         }
         return null;
     }
