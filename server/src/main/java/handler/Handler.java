@@ -15,7 +15,6 @@ import java.util.Map;
 
 public class Handler {
     public void handleError(Context ctx, Exception e){
-        Gson gson = new Gson();
         String message = e.getMessage();
         ErrorResult result = new ErrorResult(e.getMessage());
         if (e.getClass().equals(BadRequestException.class)){

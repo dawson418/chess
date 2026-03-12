@@ -21,8 +21,7 @@ public class Server {
             authDAO = new AuthSQLData();
             gameDAO = new GameSQLData();
         } catch(DataAccessException e){
-            e.printStackTrace();
-            throw new RuntimeException("Failed to initialize SQL DAOs", e);
+            throw new RuntimeException("Failed to initialize SQL DAOs");
         }
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO);

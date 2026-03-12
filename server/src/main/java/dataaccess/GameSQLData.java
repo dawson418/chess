@@ -3,7 +3,6 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class GameSQLData extends SQLData implements GameDataAccess{
 
@@ -104,7 +102,7 @@ public class GameSQLData extends SQLData implements GameDataAccess{
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        ArrayList<GameData> games = new ArrayList<GameData>();
+        ArrayList<GameData> games = new ArrayList<>();
         try (Connection conn = DatabaseManager.getConnection()){
             String statement = "SELECT * FROM game";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
