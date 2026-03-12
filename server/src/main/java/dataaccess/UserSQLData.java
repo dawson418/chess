@@ -36,11 +36,10 @@ public class UserSQLData extends SQLData implements UserDataAccess {
                 try (ResultSet rs = ps.executeQuery()) {
                     if (!rs.next()) {
                         throw new UnauthorizedException();
-                    } else{
-                        String storedHashedPW = rs.getString("password");
-                        if(BCrypt.checkpw(password, storedHashedPW)){
-                            return new UserData(username, password, rs.getString("email"));
-                        }
+                    }
+                    String storedHashedPW = rs.getString("password");
+                    if(BCrypt.checkpw(password, storedHashedPW)){
+                        return new UserData(username, password, rs.getString("email"));
                     }
                 }
             }
