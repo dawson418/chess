@@ -20,12 +20,13 @@ public class UserSQLData extends SQLData implements UserDataAccess {
     @Override
     public void clear() throws DataAccessException {
         var statement = "TRUNCATE user";
+        executeUpdate(statement);
     }
 
     @Override
     public void createUser(UserData data) throws DataAccessException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        int id = executeUpdate(statement, data.username(), data.password(), data.email());
+        executeUpdate(statement, data.username(), data.password(), data.email());
     }
 
     @Override
