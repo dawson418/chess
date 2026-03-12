@@ -11,10 +11,19 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        UserDataAccess userDAO = new UserMemoryData();
-        AuthDataAccess authDAO = new AuthMemoryData();
-        GameDataAccess gameDAO = new GameMemoryData();
 
+        UserDataAccess userDAO;
+        AuthDataAccess authDAO;
+        GameDataAccess gameDAO;
+
+        try {
+            userDAO = new UserSQLData();
+            authDAO = new AuthSQLData();
+            gameDAO = new GameSQLData();
+        } catch(DataAccessException e){
+            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize SQL DAOs", e);
+        }
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO);
         AuthService authService = new AuthService(authDAO);
