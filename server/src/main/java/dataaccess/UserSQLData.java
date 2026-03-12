@@ -48,7 +48,7 @@ public class UserSQLData extends SQLData implements UserDataAccess {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
         throw new UnauthorizedException();
