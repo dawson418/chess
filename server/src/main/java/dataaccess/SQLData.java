@@ -50,19 +50,19 @@ public class SQLData {
             """,
             """
             CREATE TABLE IF NOT EXISTS auth (
-            'token' varchar(256),
-            'username' varchar(256),
-            PRIMARY KEY ('token')
+            `token` varchar(256),
+            `username` varchar(256),
+            PRIMARY KEY (`token`)
             )
             """,
             """
             CREATE TABLE IF NOT EXISTS game (
-            'gameid' int NOT NULL,
-            'whiteuser' varchar(256),
-            'blackuser' varchar(256),
-            'name' varchar(256),
-            'chessgame' json TEXT DEFAULT NULL),
-            PRIMARY KEY ('gameid')
+            `gameid` int NOT NULL AUTO_INCREMENT,
+            `whiteuser` varchar(256),
+            `blackuser` varchar(256),
+            `name` varchar(256),
+            `chessgame` json TEXT DEFAULT NULL),
+            PRIMARY KEY (`gameid`)
             """
     };
 }
