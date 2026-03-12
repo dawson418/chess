@@ -5,6 +5,7 @@ import model.AuthData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class AuthSQLData extends SQLData implements AuthDataAccess{
@@ -39,13 +40,16 @@ public class AuthSQLData extends SQLData implements AuthDataAccess{
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        } catch (SQLException e) {
+            throw new UnauthorizedException();
         }
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
+        if(getUsername(authToken) == null){
+            throw new UnauthorizedException();
+        }
         var statement = "DELETE FROM auth WHERE token=?";
         executeUpdate(statement, authToken);
     }
@@ -62,8 +66,8 @@ public class AuthSQLData extends SQLData implements AuthDataAccess{
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        } catch (SQLException e) {
+            throw new UnauthorizedException();
         }
         return null;
     }
