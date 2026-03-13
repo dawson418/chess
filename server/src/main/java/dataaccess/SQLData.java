@@ -15,11 +15,11 @@ public class SQLData {
                 for (int i = 0; i < params.length; i++) {
                     ps.setObject(i+1, params[i]);
                 }
-                ps.executeUpdate();
+                int rowCount = ps.executeUpdate();
 
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {return rs.getInt(1);}
-                return 0;
+                return rowCount;
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
