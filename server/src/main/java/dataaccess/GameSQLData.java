@@ -63,7 +63,7 @@ public class GameSQLData extends SQLData implements GameDataAccess{
     }
 
     @Override
-    public boolean isEmpty(ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
+    public boolean isEmpty(ChessGame.TeamColor playerColor, int gameID) throws DataAccessException{
         String column;
         if (playerColor == ChessGame.TeamColor.WHITE){
             column = "whiteuser";
@@ -89,7 +89,7 @@ public class GameSQLData extends SQLData implements GameDataAccess{
     }
 
     @Override
-    public void joinGame(ChessGame.TeamColor playerColor, int gameID, String username) throws DataAccessException {
+    public void joinGame(ChessGame.TeamColor playerColor, int gameID, String username) throws DataAccessException{
         String column;
         if (playerColor == ChessGame.TeamColor.WHITE){
             column = "whiteuser";
@@ -97,11 +97,14 @@ public class GameSQLData extends SQLData implements GameDataAccess{
             column = "blackuser";
         }
         String statement = String.format("UPDATE game SET %s=? WHERE gameid=?", column);
-        executeUpdate(statement, username, gameID);
+        int rowCount = executeUpdate(statement, username, gameID);
+        if (rowCount == 0){
+            throw new BadRequestException();
+        }
     }
 
     @Override
-    public Collection<GameData> listGames() throws DataAccessException {
+    public Collection<GameData> listGames() throws DataAccessException{
         ArrayList<GameData> games = new ArrayList<>();
         try (Connection conn = DatabaseManager.getConnection()){
             String statement = "SELECT * FROM game";
@@ -123,4 +126,13 @@ public class GameSQLData extends SQLData implements GameDataAccess{
         }
         return games;
     }
+
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException{
+        var statement = "UPDATE game SET chessgame=? WHERE gameid=?";
+        int rowCount = executeUpdate(statement, gson.toJson(game), gameID);
+        if (rowCount == 0){
+            throw new BadRequestException();
+        }
+    }
+
 }
