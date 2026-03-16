@@ -8,8 +8,6 @@ import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
-import server.AuthService;
-import server.GameService;
 import server.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
