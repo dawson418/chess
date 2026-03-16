@@ -3,7 +3,6 @@ package service;
 import dataaccess.*;
 import model.UserData;
 import org.junit.jupiter.api.Test;
-import request.JoinGameRequest;
 import server.AuthService;
 import server.GameService;
 import server.UserService;
