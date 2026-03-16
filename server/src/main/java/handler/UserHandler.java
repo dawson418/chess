@@ -7,7 +7,7 @@ import io.javalin.http.Context;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
-import result.*;
+import result.LoginResult;
 import server.UserService;
 
 public class UserHandler extends Handler{

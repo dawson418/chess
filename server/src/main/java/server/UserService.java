@@ -2,8 +2,10 @@ package server;
 
 import dataaccess.*;
 import model.*;
-import request.*;
-import result.*;
+import request.LoginRequest;
+import request.LogoutRequest;
+import request.RegisterRequest;
+import result.LoginResult;
 
 public class UserService extends Service{
     private final UserDataAccess userDAO;
