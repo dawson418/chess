@@ -4,6 +4,7 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.GameData;
 import request.*;
+import ui.BoardUI;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,13 +133,14 @@ public class ChessClient {
             if (i < 0 || i > gameList.size()){
                 throw new ResponseException(400, "Please enter a valid game number");
             }
+            ChessGame game = gameList.get(i).game();
             int gameID = gameList.get(i).gameID();
             ChessGame.TeamColor color = ChessGame.TeamColor.WHITE;
             if (params[1].equalsIgnoreCase("BLACK")){
                 color = ChessGame.TeamColor.BLACK;
             }
             server.joinGame(new JoinGameRequest(color, gameID, this.name), this.authToken);
-            return "Chessboard lol";
+            return new BoardUI(game.getBoard()).drawBoard(color);
         }
         throw new ResponseException(400, "Expected: join <NUMBER> [WHITE|BLACK]");
     }
@@ -158,8 +160,13 @@ public class ChessClient {
                 throw new ResponseException(400, "Please enter a valid game number");
             }
             int gameID = gameList.get(i).gameID();
+            ChessGame game = gameList.get(i).game();
+            ChessGame.TeamColor color = ChessGame.TeamColor.WHITE;
+            if (params[1].equalsIgnoreCase("BLACK")){
+                color = ChessGame.TeamColor.BLACK;
+            }
             server.joinGame(new JoinGameRequest(null, gameID, this.name), this.authToken);
-            return "Chessboard lol";
+            return new BoardUI(game.getBoard()).drawBoard(color);
         }
         throw new ResponseException(400, "Expected: join <NUMBER>");
     }
