@@ -15,8 +15,8 @@ public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
 
-    public ServerFacade(int port) {
-        serverUrl = "http://localhost:" + port;
+    public ServerFacade(String url) {
+        serverUrl = url;
     }
 
     public LoginResult register(RegisterRequest requestInfo) throws ResponseException{
