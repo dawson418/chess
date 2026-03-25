@@ -1,14 +1,12 @@
 package client;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
 import exception.ResponseException;
 import model.GameData;
 import request.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
@@ -35,7 +33,7 @@ public class ChessClient {
 
             try {
                 result = eval(line);
-                System.out.print(BLUE + result);
+                System.out.print(result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -45,7 +43,7 @@ public class ChessClient {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET + ">>> " + GREEN);
+        System.out.print("\n>>> ");
     }
 
 
@@ -59,9 +57,9 @@ public class ChessClient {
                 case "login" -> login(params);
                 case "create" -> createGame(params);
                 case "list" -> listGames();
-                case "join" -> join();
+                case "join" -> join(params);
                 case "logout" -> logout();
-                case "observe" -> observe();
+                case "observe" -> observe(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -84,6 +82,7 @@ public class ChessClient {
     public String logout() throws ResponseException {
         assertSignedIn();
         server.logout(new LogoutRequest(this.authToken));
+        this.state = State.PRELOGIN;
         return "Logged out";
     }
 
@@ -130,7 +129,7 @@ public class ChessClient {
             catch (NumberFormatException e){
                 throw new ResponseException(400, "Please enter a valid game number");
             }
-            if (i < 1 || i > gameList.size()){
+            if (i < 0 || i > gameList.size()){
                 throw new ResponseException(400, "Please enter a valid game number");
             }
             int gameID = gameList.get(i).gameID();
@@ -155,7 +154,7 @@ public class ChessClient {
             catch (NumberFormatException e){
                 throw new ResponseException(400, "Please enter a valid game number");
             }
-            if (i < 1 || i > gameList.size()){
+            if (i < 0 || i > gameList.size()){
                 throw new ResponseException(400, "Please enter a valid game number");
             }
             int gameID = gameList.get(i).gameID();
