@@ -70,7 +70,7 @@ public class ChessClient {
     }
 
     public String login(String... params) throws ResponseException {
-        if (params.length >= 2) {
+        if (params.length == 2) {
             var result = server.login(new LoginRequest(params[0], params[1]));
             this.authToken = result.authToken();
             state = State.POSTLOGIN;
@@ -88,7 +88,7 @@ public class ChessClient {
     }
 
     public String register(String... params) throws ResponseException {
-        if (params.length >= 3) {
+        if (params.length == 3) {
             var result = server.register(new RegisterRequest(params[0], params[1], params[2]));
             this.authToken = result.authToken();
             state = State.POSTLOGIN;
@@ -100,7 +100,7 @@ public class ChessClient {
 
     public String createGame(String... params) throws ResponseException {
         assertSignedIn();
-        if (params.length >= 1) {
+        if (params.length == 1) {
             server.createGame(new CreateGameRequest(params[0]), this.authToken);
             return "Game created";
         }
@@ -121,7 +121,7 @@ public class ChessClient {
     }
 
     public String join(String... params) throws ResponseException{
-        if (params.length >= 2){
+        if (params.length == 2){
             assertSignedIn();
             int i;
             try {
@@ -147,7 +147,7 @@ public class ChessClient {
 
     public String observe(String... params) throws ResponseException{
         assertSignedIn();
-        if (params.length >= 1){
+        if (params.length == 1){
             assertSignedIn();
             int i;
             try {
@@ -162,7 +162,7 @@ public class ChessClient {
             int gameID = gameList.get(i).gameID();
             ChessGame game = gameList.get(i).game();
             ChessGame.TeamColor color = ChessGame.TeamColor.WHITE;
-            if (params[1].equalsIgnoreCase("BLACK")){
+            if (params[0].equalsIgnoreCase("BLACK")){
                 color = ChessGame.TeamColor.BLACK;
             }
             server.joinGame(new JoinGameRequest(null, gameID, this.name), this.authToken);

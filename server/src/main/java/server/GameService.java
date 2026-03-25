@@ -31,13 +31,14 @@ public class GameService extends Service{
     }
 
     public void joinGame(JoinGameRequest request) throws DataAccessException{
-        if (request.playerColor() == null || request.gameID() <= 0 || request.username() == null){
+        if (request.gameID() <= 0 || request.username() == null){
             throw new BadRequestException();
         }
         if(!gameDAO.isEmpty(request.playerColor(), request.gameID())){
             throw new AlreadyTakenException();
         }
-
-        gameDAO.joinGame(request.playerColor(), request.gameID(), request.username());
+        if(request.playerColor() != null){
+            gameDAO.joinGame(request.playerColor(), request.gameID(), request.username());
+        }
     }
 }

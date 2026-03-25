@@ -52,13 +52,6 @@ public class BoardUI {
                 } else {
                     sb.append(SET_BG_COLOR_BLACK);
                 }
-                if(perspective == ChessGame.TeamColor.BLACK){
-                    if ((r + c) % 2 != 0) {
-                        sb.append(SET_BG_COLOR_BLACK);
-                    } else {
-                        sb.append(SET_BG_COLOR_WHITE);
-                    }
-                }
                 sb.append(getPieceRep(r, c));
             }
             sb
