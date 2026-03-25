@@ -108,6 +108,9 @@ public class ServerFacadeTests {
     @Test
     void joinGameNegative() throws ResponseException {
         var reg = facade.register(new RegisterRequest("Biggy_Cheese", "chedda67", "hehehe@byu.edu"));
-        assertThrows(ResponseException.class, () -> facade.joinGame(new JoinGameRequest(ChessGame.TeamColor.WHITE, -1, "Biggy_Cheese"), reg.authToken()));
+        assertThrows(ResponseException.class, () -> facade.joinGame(
+                new JoinGameRequest(ChessGame.TeamColor.WHITE, -1, "Biggy_Cheese"),
+                reg.authToken())
+        );
     }
 }
