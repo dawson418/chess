@@ -1,19 +1,23 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
-import request.CreateGameRequest;
-import request.LoginRequest;
-import request.RegisterRequest;
+import model.GameData;
+import request.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class ChessClient {
+    private String name = null;
     private final ServerFacade server;
     private State state = State.PRELOGIN;
     private String authToken = null;
+    private ArrayList<GameData> gameList = new ArrayList<>();
 
     public ChessClient(String serverUrl) throws ResponseException {
         server = new ServerFacade(serverUrl);
@@ -54,10 +58,10 @@ public class ChessClient {
                 case "register" -> register(params);
                 case "login" -> login(params);
                 case "create" -> createGame(params);
-//                case "list" ->
-//                case "join" ->
-//                case "logout" ->
-//                case "observe" ->
+                case "list" -> listGames();
+                case "join" -> join();
+                case "logout" -> logout();
+                case "observe" -> observe();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -71,27 +75,94 @@ public class ChessClient {
             var result = server.login(new LoginRequest(params[0], params[1]));
             this.authToken = result.authToken();
             state = State.POSTLOGIN;
+            this.name = params[0];
             return "Login success";
         }
         throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD>");
     }
 
+    public String logout() throws ResponseException {
+        assertSignedIn();
+        server.logout(new LogoutRequest(this.authToken));
+        return "Logged out";
+    }
+
     public String register(String... params) throws ResponseException {
         if (params.length >= 3) {
-            var result = server.register(new RegisterRequest(params[0], params[1], params[3]));
+            var result = server.register(new RegisterRequest(params[0], params[1], params[2]));
             this.authToken = result.authToken();
             state = State.POSTLOGIN;
+            this.name = params[0];
             return "Register success";
         }
         throw new ResponseException(400, "Expected: <USERNAME> <PASSWORD> <EMAIL>");
     }
 
     public String createGame(String... params) throws ResponseException {
+        assertSignedIn();
         if (params.length >= 1) {
-            var result = server.createGame(new CreateGameRequest(params[0]), this.authToken);
+            server.createGame(new CreateGameRequest(params[0]), this.authToken);
             return "Game created";
         }
         throw new ResponseException(400, "Expected: <NAME>");
+    }
+
+    public String listGames() throws ResponseException {
+        assertSignedIn();
+        var result = server.listGames(this.authToken).games();
+        this.gameList = new ArrayList<>(result);
+        var output = new StringBuilder();
+        for (int i = 0; i < gameList.size(); i++) {
+            GameData game = gameList.get(i);
+            output.append(String.format("%d. %s (White: %s, Black: %s)\n",
+                    i + 1, game.gameName(), game.whiteUsername(), game.blackUsername()));
+        }
+        return output.toString();
+    }
+
+    public String join(String... params) throws ResponseException{
+        if (params.length >= 2){
+            assertSignedIn();
+            int i;
+            try {
+                i = Integer.parseInt(params[0]) - 1;
+            }
+            catch (NumberFormatException e){
+                throw new ResponseException(400, "Please enter a valid game number");
+            }
+            if (i < 1 || i > gameList.size()){
+                throw new ResponseException(400, "Please enter a valid game number");
+            }
+            int gameID = gameList.get(i).gameID();
+            ChessGame.TeamColor color = ChessGame.TeamColor.WHITE;
+            if (params[1].equalsIgnoreCase("BLACK")){
+                color = ChessGame.TeamColor.BLACK;
+            }
+            server.joinGame(new JoinGameRequest(color, gameID, this.name), this.authToken);
+            return "Chessboard lol";
+        }
+        throw new ResponseException(400, "Expected: join <NUMBER> [WHITE|BLACK]");
+    }
+
+    public String observe(String... params) throws ResponseException{
+        assertSignedIn();
+        if (params.length >= 1){
+            assertSignedIn();
+            int i;
+            try {
+                i = Integer.parseInt(params[0]) - 1;
+            }
+            catch (NumberFormatException e){
+                throw new ResponseException(400, "Please enter a valid game number");
+            }
+            if (i < 1 || i > gameList.size()){
+                throw new ResponseException(400, "Please enter a valid game number");
+            }
+            int gameID = gameList.get(i).gameID();
+            server.joinGame(new JoinGameRequest(null, gameID, this.name), this.authToken);
+            return "Chessboard lol";
+        }
+        throw new ResponseException(400, "Expected: join <NUMBER>");
     }
 
     public String help() {
