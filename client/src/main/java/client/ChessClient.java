@@ -139,7 +139,7 @@ public class ChessClient {
             if (params[1].equalsIgnoreCase("WHITE")){
                 color = ChessGame.TeamColor.WHITE;
             }
-            if (params[1].equalsIgnoreCase("BLACK")){
+            else if (params[1].equalsIgnoreCase("BLACK")){
                 color = ChessGame.TeamColor.BLACK;
             } else {
                 throw new ResponseException(400, "Error: Not a valid color");
