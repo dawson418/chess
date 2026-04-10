@@ -5,6 +5,7 @@ import handler.GameHandler;
 import handler.Handler;
 import handler.UserHandler;
 import io.javalin.*;
+import server.websocket.WebSocketHandler;
 
 public class Server {
 
@@ -29,9 +30,15 @@ public class Server {
 
         UserHandler userHandler = new UserHandler(userService);
         GameHandler gameHandler = new GameHandler(gameService, authService);
+        WebSocketHandler webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
         Handler masterHandler = new Handler();
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
+                .ws("/ws", ws -> {
+                    ws.onConnect(webSocketHandler);
+                    ws.onMessage(webSocketHandler);
+                    ws.onClose(webSocketHandler);
+                })
                 .post("/user", userHandler::handleRegister)
                 .post("/session", userHandler::handleLogin)
                 .post("/game", gameHandler::handleCreateGame)
