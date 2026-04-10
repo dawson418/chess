@@ -14,7 +14,7 @@ public class ChessGame {
 
     TeamColor teamTurn;
     ChessBoard mainBoard;
-    private Boolean isOver;
+    private Boolean isOver = false;
 
     public Boolean isOver(){
         return isOver;
