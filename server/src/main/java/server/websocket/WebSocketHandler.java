@@ -106,6 +106,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (gameData ==null) throw new BadRequestException();
         ChessGame game = gameData.game();
 
+        if (game.isOver()) {
+            throw new Exception("Game is already over!");
+        }
         ChessGame.TeamColor playerColor = null;
         if(username.equals(gameData.whiteUsername())){
             playerColor = ChessGame.TeamColor.WHITE;
@@ -131,6 +134,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String notificationMsg = username + " moved " + piece;
         NotificationMessage notification = new NotificationMessage(NOTIFICATION, notificationMsg);
         connections.broadcast(gameID, authToken, new Gson().toJson(notification));
+
+        if (game.isInCheckmate(ChessGame.TeamColor.WHITE) || game.isInCheckmate(ChessGame.TeamColor.BLACK)){
+            game.setGameOver();
+            gameDAO.updateGame(gameID, game);
+            NotificationMessage checkmateMsg = new NotificationMessage(NOTIFICATION, username + "won the game!");
+            connections.broadcast(gameID, null, new Gson().toJson(checkmateMsg));
+        } else if (game.isInCheck(ChessGame.TeamColor.WHITE) || game.isInCheck(ChessGame.TeamColor.BLACK)){
+            NotificationMessage checkMsg = new NotificationMessage(NOTIFICATION, username + "put the opponent in check");
+            connections.broadcast(gameID, null, new Gson().toJson(checkMsg));
+        }
     }
 
     private void leave(String message, Session session) throws Exception {
