@@ -97,13 +97,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         try {
             username = authDAO.getUsername(authToken);
-            if (username == null) throw new UnauthorizedException();
+            if (username == null) {
+                throw new UnauthorizedException();
+            }
         } catch (DataAccessException e){
             throw new UnauthorizedException();
         }
 
         GameData gameData = gameDAO.getGame(gameID);
-        if (gameData ==null) throw new BadRequestException();
+        if (gameData ==null) {
+            throw new BadRequestException();
+        }
         ChessGame game = gameData.game();
 
         if (game.isOver()) {
