@@ -1,9 +1,8 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -51,6 +50,75 @@ public class BoardUI {
                     sb.append(SET_BG_COLOR_WHITE);
                 } else {
                     sb.append(SET_BG_COLOR_BLACK);
+                }
+                sb.append(getPieceRep(r, c));
+            }
+            sb
+                    .append(SET_BG_COLOR_BLACK)
+                    .append(SET_TEXT_COLOR_WHITE)
+                    .append(" ")
+                    .append(r)
+                    .append(" ")
+                    .append(RESET_BG_COLOR)
+                    .append(RESET_TEXT_COLOR)
+                    .append("\n");
+        }
+        drawHeader(sb, headers);
+        return sb.toString();
+    }
+
+    public String drawBoard(ChessGame.TeamColor perspective, ChessPosition position, Collection<ChessMove> validMoves) {
+        StringBuilder sb = new StringBuilder();
+
+        String[] headers = {EMPTY, " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", EMPTY};
+
+        if (perspective == ChessGame.TeamColor.BLACK) {
+            headers = new String[]{EMPTY, " h ", " g ", " f ", " e ", " d ", " c ", " b ", " a ", EMPTY};
+        }
+        drawHeader(sb, headers);
+        int startRow = 1;
+        int endRow = 8;
+        int stepR = 1;
+        if(perspective.equals(ChessGame.TeamColor.WHITE)){
+            startRow = 8;
+            endRow = 1;
+            stepR = -1;
+        }
+        for (int r = startRow; (stepR > 0 ? r <= endRow : r >= endRow); r += stepR) {
+            sb
+                    .append(SET_BG_COLOR_BLACK)
+                    .append(SET_TEXT_COLOR_WHITE)
+                    .append(" ")
+                    .append(r)
+                    .append(" ");
+            int startCol = 8;
+            int endCol = 1;
+            int stepC = -1;
+            if (perspective.equals(ChessGame.TeamColor.WHITE)) {
+                startCol = 1;
+                endCol = 8;
+                stepC = 1;
+            }
+            for (int c = startCol; (stepC > 0 ? c <= endCol : c >= endCol); c += stepC) {
+                ChessPosition currPos = new ChessPosition(r, c);
+                boolean isStart = currPos.equals(position);
+                boolean isHighlight = false;
+                for (chess.ChessMove move : validMoves) {
+                    if (move.getEndPosition().equals(position)) {
+                        isHighlight = true;
+                        break;
+                    }
+                }
+                if (isStart){
+                    sb.append(SET_BG_COLOR_DARK_GREY);
+                } else if (isHighlight){
+                    sb.append(SET_BG_COLOR_BLUE);
+                } else {
+                    if ((r + c) % 2 != 0) {
+                        sb.append(SET_BG_COLOR_WHITE);
+                    } else {
+                        sb.append(SET_BG_COLOR_BLACK);
+                    }
                 }
                 sb.append(getPieceRep(r, c));
             }
