@@ -2,5 +2,6 @@ package client;
 
 public enum State {
     PRELOGIN,
-    POSTLOGIN
+    POSTLOGIN,
+    IN_GAME
 }
