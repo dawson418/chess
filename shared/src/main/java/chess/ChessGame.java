@@ -14,7 +14,15 @@ public class ChessGame {
 
     TeamColor teamTurn;
     ChessBoard mainBoard;
+    private Boolean isOver;
 
+    public Boolean isOver(){
+        return isOver;
+    }
+
+    public void setGameOver(){
+        isOver = true;
+    }
 
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
