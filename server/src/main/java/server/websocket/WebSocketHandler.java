@@ -5,16 +5,11 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import com.google.gson.Gson;
 import dataaccess.*;
-import exception.ResponseException;
 import io.javalin.websocket.*;
-import model.AuthData;
-import model.GameData;
+import model.*;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.*;
-import websocket.messages.ErrorMessage;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
+import websocket.messages.*;
 
 import java.io.IOException;
 
@@ -133,9 +128,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         LoadGameMessage loadMsg = new LoadGameMessage(LOAD_GAME, game);
         connections.broadcast(gameID, null, new Gson().toJson(loadMsg));
 
-        String notificationMsg = username + " moved " + piece.toString();
+        String notificationMsg = username + " moved " + piece;
         NotificationMessage notification = new NotificationMessage(NOTIFICATION, notificationMsg);
-        connections.broadcast(gameID, authToken, new Gson().toJson(notification));()
+        connections.broadcast(gameID, authToken, new Gson().toJson(notification));
     }
 
     private void leave(String message, Session session) throws Exception {
