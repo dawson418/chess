@@ -89,23 +89,23 @@ public class ChessClient implements ServerMessageHandler{
     }
 
     private String highlightMoves(String... params) {
-
+        return null;
     }
 
     private String resignGame() {
-
+        return null;
     }
 
     private String makeMove(String... params) {
-
+        return null;
     }
 
     private String leaveGame() {
-
+        return null;
     }
 
     private String redrawBoard() {
-
+        return null;
     }
 
     public String login(String... params) throws ResponseException {
@@ -249,6 +249,10 @@ public class ChessClient implements ServerMessageHandler{
                     resign
                     highlight <POSITION>
                     help""";
+            }
+
+            default -> {
+                return null;
             }
         }
 
