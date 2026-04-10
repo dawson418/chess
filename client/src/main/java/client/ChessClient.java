@@ -13,6 +13,7 @@ import websocket.messages.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Scanner;
 
 import static client.State.IN_GAME;
@@ -24,6 +25,7 @@ public class ChessClient implements ServerMessageHandler{
     private final ServerFacade server;
     private final String serverUrl;
     private int currGameID = -1;
+    private chess.ChessGame currGame = null;
     private State state = State.PRELOGIN;
     private String authToken = null;
     private ArrayList<GameData> gameList = new ArrayList<>();
@@ -92,13 +94,29 @@ public class ChessClient implements ServerMessageHandler{
         }
     }
 
-    private String highlightMoves(String... params) {
-        return null;
+    private String highlightMoves(String... params) throws ResponseException{
+        if (params.length != 1) {
+            throw new ResponseException(400, "Expected: highlight <POSITION>");
+        }
+        if (currGame == null) {
+            throw new ResponseException(400, "No game loaded");
+        }
+        ChessPosition position = parsePosition(params[0]);
+        Collection<ChessMove> validMoves = currGame.validMoves(position);
+        if (validMoves == null || validMoves.isEmpty()){
+            return "This piece cannot move!";
+        }
+        String highlightedBoard = new BoardUI(currGame.getBoard()).drawBoard(playerColor, position, validMoves);
+        return "\n" + highlightedBoard;
     }
 
     private String resignGame() throws ResponseException{
-        ws.resign(authToken, currGameID);
-        return "Game resigned";
+        System.out.print("Resign game? (y/n)");
+        String input = new Scanner(System.in).nextLine().toLowerCase();
+        if (input.equals("yes")) {
+            ws.resign(authToken, currGameID);
+        }
+        return "";
     }
 
     private String makeMove(String... params)throws ResponseException{
@@ -144,8 +162,12 @@ public class ChessClient implements ServerMessageHandler{
         return "You left the game.";
     }
 
-    private String redrawBoard() {
-        return null;
+    private String redrawBoard() throws ResponseException{
+        if (currGame == null) {
+            throw new ResponseException(400, "No game loaded");
+        }
+        String board = new BoardUI(currGame.getBoard()).drawBoard(playerColor);
+        return "\n" + board;
     }
 
     public String login(String... params) throws ResponseException {
@@ -320,6 +342,7 @@ public class ChessClient implements ServerMessageHandler{
 
     private void handleLoadGame(String message) {
         LoadGameMessage gameMsg = new Gson().fromJson(message, LoadGameMessage.class);
+        this.currGame = gameMsg.getGame();
         String board = new BoardUI(gameMsg.getGame().getBoard()).drawBoard(this.playerColor);
         System.out.println("\n" + board);
         printPrompt();
