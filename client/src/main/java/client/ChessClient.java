@@ -1,6 +1,9 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.GameData;
@@ -20,6 +23,7 @@ public class ChessClient implements ServerMessageHandler{
     private String name = null;
     private final ServerFacade server;
     private final String serverUrl;
+    private int currGameID = -1;
     private State state = State.PRELOGIN;
     private String authToken = null;
     private ArrayList<GameData> gameList = new ArrayList<>();
@@ -92,16 +96,52 @@ public class ChessClient implements ServerMessageHandler{
         return null;
     }
 
-    private String resignGame() {
-        return null;
+    private String resignGame() throws ResponseException{
+        ws.resign(authToken, currGameID);
+        return "Game resigned";
     }
 
-    private String makeMove(String... params) {
-        return null;
+    private String makeMove(String... params)throws ResponseException{
+        if (params.length < 2){
+            throw new ResponseException(400, "Expected: move <START> <END> [PROMOTION]");
+        }
+
+        ChessPosition startPos = parsePosition(params[0]);
+        ChessPosition endPos = parsePosition(params[1]);
+
+        ChessPiece.PieceType promotionPiece = null;
+        if (params.length == 3) {
+            promotionPiece = switch (params[2].toUpperCase()) {
+                case "QUEEN" -> chess.ChessPiece.PieceType.QUEEN;
+                case "ROOK" -> chess.ChessPiece.PieceType.ROOK;
+                case "BISHOP" -> chess.ChessPiece.PieceType.BISHOP;
+                case "KNIGHT" -> chess.ChessPiece.PieceType.KNIGHT;
+                default -> null;
+            };
+        }
+        ChessMove move = new ChessMove(startPos, endPos, promotionPiece);
+        ws.makeMove(authToken, currGameID, move);
+        return "";
     }
 
-    private String leaveGame() {
-        return null;
+    private chess.ChessPosition parsePosition(String pos) throws ResponseException {
+        try {
+            if (pos.length() != 2) throw new Exception();
+            int col = pos.charAt(0) - 'a' + 1;
+            int row = Integer.parseInt(pos.substring(1, 2));
+            if (col < 1 || col > 8 || row < 1 || row > 8) throw new Exception();
+            return new chess.ChessPosition(row, col);
+        } catch (Exception e) {
+            throw new ResponseException(400, "Invalid position: " + pos);
+        }
+    }
+
+    private String leaveGame() throws ResponseException{
+        ws.leave(authToken, currGameID);
+        this.state = State.POSTLOGIN;
+        this.currGameID = -1;
+        this.ws = null;
+        return "You left the game.";
     }
 
     private String redrawBoard() {
@@ -187,6 +227,8 @@ public class ChessClient implements ServerMessageHandler{
             playerColor = color;
             ws = new WebSocketFacade(serverUrl, this);
             ws.connect(authToken, gameID);
+            this.currGameID = gameID;
+            this.state = State.IN_GAME;
             return new BoardUI(game.getBoard()).drawBoard(color);
         }
         throw new ResponseException(400, "Expected: join <NUMBER> [WHITE|BLACK]");
@@ -213,7 +255,8 @@ public class ChessClient implements ServerMessageHandler{
             }
             ws = new WebSocketFacade(this.serverUrl, this);
             ws.connect(authToken, gameList.get(i).gameID());
-
+            this.currGameID = gameList.get(i).gameID();
+            this.state = State.IN_GAME;
             return new BoardUI(game.getBoard()).drawBoard(playerColor);
         }
         throw new ResponseException(400, "Expected: join <NUMBER>");
