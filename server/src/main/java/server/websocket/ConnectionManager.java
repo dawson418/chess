@@ -30,7 +30,7 @@ public class ConnectionManager {
             for (var entry : gameConnections.entrySet()) {
                 String authToken = entry.getKey();
                 Session session = entry.getValue();
-                if (session.isOpen() && !excludedToken.equals(authToken)){
+                if (session.isOpen() && (excludedToken == null || !excludedToken.equals(authToken))){
                     session.getRemote().sendString(msg);
                 }
             }
