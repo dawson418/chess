@@ -11,6 +11,9 @@ import websocket.messages.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import static client.State.IN_GAME;
+import static client.State.POSTLOGIN;
 import static ui.EscapeSequences.*;
 
 public class ChessClient implements ServerMessageHandler{
@@ -58,6 +61,17 @@ public class ChessClient implements ServerMessageHandler{
             String[] tokens = input.toLowerCase().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            if (state == IN_GAME) {
+                return switch (cmd) {
+                    case "redraw" -> redrawBoard();
+                    case "leave" -> leaveGame();
+                    case "move" -> makeMove(params);
+                    case "resign" -> resignGame();
+                    case "highlight" -> highlightMoves(params);
+                    case "help" -> help();
+                    default -> help();
+                };
+            }
             return switch (cmd) {
                 case "register" -> register(params);
                 case "login" -> login(params);
@@ -74,11 +88,31 @@ public class ChessClient implements ServerMessageHandler{
         }
     }
 
+    private String highlightMoves(String... params) {
+
+    }
+
+    private String resignGame() {
+
+    }
+
+    private String makeMove(String... params) {
+
+    }
+
+    private String leaveGame() {
+
+    }
+
+    private String redrawBoard() {
+
+    }
+
     public String login(String... params) throws ResponseException {
         if (params.length == 2) {
             var result = server.login(new LoginRequest(params[0], params[1]));
             this.authToken = result.authToken();
-            state = State.POSTLOGIN;
+            state = POSTLOGIN;
             this.name = params[0];
             return "Login success";
         }
@@ -96,7 +130,7 @@ public class ChessClient implements ServerMessageHandler{
         if (params.length == 3) {
             var result = server.register(new RegisterRequest(params[0], params[1], params[2]));
             this.authToken = result.authToken();
-            state = State.POSTLOGIN;
+            state = POSTLOGIN;
             this.name = params[0];
             return "Register success";
         }
@@ -186,23 +220,38 @@ public class ChessClient implements ServerMessageHandler{
     }
 
     public String help() {
-        if (state == State.PRELOGIN) {
-            return """
+        switch(state)
+        {
+            case PRELOGIN ->{
+                return """
                     register <USERNAME> <PASSWORD> <EMAIL>
                     login <USERNAME> <PASSWORD>
                     quit
                     help
                     """;
+            }
+            case POSTLOGIN ->{
+                return """
+                    create <NAME>
+                    list
+                    join <ID> [WHITE|BLACK]
+                    observe <ID>
+                    logout
+                    quit
+                    help
+                    """;
+            }
+            case IN_GAME -> {
+                return """
+                    redraw
+                    leave
+                    move <START_POSITION> <END_POSITION>
+                    resign
+                    highlight <POSITION>
+                    help""";
+            }
         }
-        return """
-                create <NAME>
-                list
-                join <ID> [WHITE|BLACK]
-                observe <ID>
-                logout
-                quit
-                help
-                """;
+
     }
 
     private void assertSignedIn() throws ResponseException {
