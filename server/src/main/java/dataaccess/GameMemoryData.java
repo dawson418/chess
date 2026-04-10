@@ -61,6 +61,11 @@ public class GameMemoryData implements GameDataAccess{
         return games.values();
     }
 
+    @Override
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException {
+
+    }
+
     private int getNextID(){
         currID++;
         return currID;
