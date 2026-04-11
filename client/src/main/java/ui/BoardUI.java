@@ -104,7 +104,7 @@ public class BoardUI {
                 boolean isStart = currPos.equals(position);
                 boolean isHighlight = false;
                 for (chess.ChessMove move : validMoves) {
-                    if (move.getEndPosition().equals(position)) {
+                    if (move.getEndPosition().equals(currPos)) {
                         isHighlight = true;
                         break;
                     }

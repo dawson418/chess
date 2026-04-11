@@ -73,6 +73,19 @@ public class ChessPiece {
     }
 
     @Override
+    public String toString(){
+        switch(type){
+            case BISHOP -> {return "bishop";}
+            case ROOK -> {return "rook";}
+            case QUEEN -> {return "queen";}
+            case PAWN -> {return "pawn";}
+            case KING -> {return "king";}
+            case KNIGHT -> {return "knight";}
+            default -> {return "unknown piece";}
+        }
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;

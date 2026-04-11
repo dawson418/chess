@@ -16,14 +16,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
 
-import static client.State.IN_GAME;
-import static client.State.POSTLOGIN;
+import static client.State.*;
 import static ui.EscapeSequences.*;
 
 public class ChessClient implements ServerMessageHandler{
     private String name = null;
     private final ServerFacade server;
     private final String serverUrl;
+    private final Scanner scanner = new Scanner(System.in);
     private int currGameID = -1;
     private chess.ChessGame currGame = null;
     private State state = State.PRELOGIN;
@@ -41,7 +41,6 @@ public class ChessClient implements ServerMessageHandler{
         System.out.println(WHITE_PAWN + "Welcome to chess!" + WHITE_PAWN);
         System.out.print(help());
 
-        Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")) {
             printPrompt();
@@ -59,7 +58,7 @@ public class ChessClient implements ServerMessageHandler{
     }
 
     private void printPrompt() {
-        System.out.print("\n>>> ");
+        System.out.print("\n");
     }
 
     public String eval(String input) {
@@ -77,6 +76,14 @@ public class ChessClient implements ServerMessageHandler{
                     case "help" -> help();
                     default -> help();
                 };
+            } else if (state == RESIGNING){
+                switch (cmd) {
+                    case "y" -> {return confirmedResign();}
+                    default -> {
+                        state = IN_GAME;
+                        return help();
+                    }
+                }
             }
             return switch (cmd) {
                 case "register" -> register(params);
@@ -92,6 +99,13 @@ public class ChessClient implements ServerMessageHandler{
         } catch (ResponseException ex) {
             return ex.getMessage();
         }
+    }
+
+    private String confirmedResign() throws ResponseException{
+        ws.resign(authToken, currGameID);
+        currGame.setGameOver();
+        state = IN_GAME;
+        return "Game resigned!";
     }
 
     private String highlightMoves(String... params) throws ResponseException{
@@ -111,12 +125,8 @@ public class ChessClient implements ServerMessageHandler{
     }
 
     private String resignGame() throws ResponseException{
-        System.out.print("Resign game? (y/n)");
-        String input = new Scanner(System.in).nextLine().toLowerCase();
-        if (input.equals("yes")) {
-            ws.resign(authToken, currGameID);
-        }
-        return "";
+        state = RESIGNING;
+        return help();
     }
 
     private String makeMove(String... params)throws ResponseException{
@@ -249,9 +259,9 @@ public class ChessClient implements ServerMessageHandler{
             playerColor = color;
             ws = new WebSocketFacade(serverUrl, this);
             ws.connect(authToken, gameID);
-            this.currGameID = gameID;
-            this.state = State.IN_GAME;
-            return new BoardUI(game.getBoard()).drawBoard(color);
+            currGameID = gameID;
+            state = State.IN_GAME;
+            return "";
         }
         throw new ResponseException(400, "Expected: join <NUMBER> [WHITE|BLACK]");
     }
@@ -279,7 +289,7 @@ public class ChessClient implements ServerMessageHandler{
             ws.connect(authToken, gameList.get(i).gameID());
             this.currGameID = gameList.get(i).gameID();
             this.state = State.IN_GAME;
-            return new BoardUI(game.getBoard()).drawBoard(playerColor);
+            return "";
         }
         throw new ResponseException(400, "Expected: join <NUMBER>");
     }
@@ -315,7 +325,9 @@ public class ChessClient implements ServerMessageHandler{
                     highlight <POSITION>
                     help""";
             }
-
+            case RESIGNING -> {
+                return "Are you sure you want to resign? (y/n)";
+            }
             default -> {
                 return null;
             }

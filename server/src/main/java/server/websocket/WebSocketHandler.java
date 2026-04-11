@@ -83,7 +83,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             role = "Black";
         }
 
-        String joinMsg = username + "joined the game as" + role;
+        String joinMsg = username + " joined the game as " + role;
         NotificationMessage notification = new NotificationMessage(NOTIFICATION, joinMsg);
         connections.broadcast(cmd.getGameID(), cmd.getAuthToken(), new Gson().toJson(notification));
     }
@@ -129,23 +129,29 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (piece == null || piece.getTeamColor() != playerColor) {
             throw new Exception("Invalid piece");
         }
-
-        game.makeMove(move);
+        try {
+            game.makeMove(move);
+        } catch (Exception e) {
+            throw new Exception("Invalid move");
+        }
         gameDAO.updateGame(gameID, game);
         LoadGameMessage loadMsg = new LoadGameMessage(LOAD_GAME, game);
         connections.broadcast(gameID, null, new Gson().toJson(loadMsg));
 
-        String notificationMsg = username + " moved " + piece;
+        String notificationMsg = username + " moved " + piece + " from " + move.getStartPosition() + " to " + move.getEndPosition();
         NotificationMessage notification = new NotificationMessage(NOTIFICATION, notificationMsg);
         connections.broadcast(gameID, authToken, new Gson().toJson(notification));
-
+        String oppName = gameData.whiteUsername();
+        if(playerColor == ChessGame.TeamColor.WHITE){
+            oppName = gameData.blackUsername();
+        }
         if (game.isInCheckmate(ChessGame.TeamColor.WHITE) || game.isInCheckmate(ChessGame.TeamColor.BLACK)){
             game.setGameOver();
             gameDAO.updateGame(gameID, game);
-            NotificationMessage checkmateMsg = new NotificationMessage(NOTIFICATION, username + "won the game!");
+            NotificationMessage checkmateMsg = new NotificationMessage(NOTIFICATION,  oppName + " is in checkmate!");
             connections.broadcast(gameID, null, new Gson().toJson(checkmateMsg));
         } else if (game.isInCheck(ChessGame.TeamColor.WHITE) || game.isInCheck(ChessGame.TeamColor.BLACK)){
-            NotificationMessage checkMsg = new NotificationMessage(NOTIFICATION, username + "put the opponent in check");
+            NotificationMessage checkMsg = new NotificationMessage(NOTIFICATION, oppName + " is in check!");
             connections.broadcast(gameID, null, new Gson().toJson(checkMsg));
         }
     }
@@ -168,6 +174,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void resign(String message, Session session) throws Exception {
+        System.out.println("Resign received: " + message);
         ResignCommand cmd = new Gson().fromJson(message, ResignCommand.class);
         String authToken = cmd.getAuthToken();
         int gameID = cmd.getGameID();
@@ -191,6 +198,5 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleClose(WsCloseContext ctx) {
         System.out.println("Websocket closed");
     }
-
 
 }
